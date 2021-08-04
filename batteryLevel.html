@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <meta name="theme-color" content="#333" />
+  <title>Document</title>
+  <style type="text/css" media="all">
+  *{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: helvetica;
+    user-select: none;
+  }
+  body{
+    background: #333;
+  }
+    .cont{
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50% , -59%);
+      height: auto;
+      width: 80%;
+      background: #f8f8f8;
+      border: 3px solid #05f;
+      overflow: hidden;
+    }
+    .cont:active{
+      opacity: 0;
+      transition:.1s 1s;
+    }
+    .cont:active ~ #status{
+      opacity: 1;
+      color: #fff;
+      transition:.1s .2s;
+    }
+    .cont:active ~ #status .batterystat{
+      border-bottom: 1px solid #fff;
+      transition:1s 1s;
+    }
+    .main{
+      position: relative;
+      top: 0;
+      left: 0;
+      height: 120px;
+      background: limegreen;
+      border-right: .01px solid #000;
+    }
+    .per{
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      text-align: center;
+      transform: translate(-50% , -50%);
+      font-size: 40px;
+      color: #fff;
+      -webkit-text-stroke: 1.2px #000;
+    }
+    #alert{
+      position: absolute;
+      top: 110%;
+      left: 50%;
+      transform: translateX(-50%);
+      height: 70px;
+      width: 100%;
+      color: #fff;
+      font-weight: lighter;
+      text-align: justify;
+      padding: 5px;
+      animation: blink .5s infinite linear;
+    }
+    #charging{
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+      color: #fff;
+      -webkit-text-stroke: 1.2px #000;
+      font-size: 30px;
+      text-align: center;
+    }
+    #status{
+      min-height: 100vh;
+      width:100%;
+      background: #333;
+      color: transparent;
+    }
+    .batterystat p{
+      margin-left: 5px;
+      margin-top: 5px;
+      font-size: 20px;
+      border-bottom: 1px solid transparent;
+    }
+    .batterystat .value{
+      font-size: 15px;
+    }
+    @keyframes blink{
+      0%,100%{
+        background: red;
+        font-size: 17px;
+      }
+      50%{
+        background: rgb(254,86,55);
+        font-size: 17.1px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="cont" id="cont">
+    <div class="main" id="main"><p class="per" id="per"></p></div>
+     <div id="alert"><p id="text"></p></div>
+  <div id="charging">
+    <p id="chargingText"></p>
+  </div>
+  </div>
+  <div id="status">
+    <div id="charginstat" class="batterystat"><p>Charging Status <p id="charginstatvalue" class="value"></p></p></div>
+  <div id="batteryper" class="batterystat"><p>Available Battery <p id="batterypervalue" class="value"></p></p></div>
+  </div>
+  <script type="text/javascript" charset="utf-8">
+  let myInterval = setInterval(function() {
+  let per = document.getElementById('per');
+  let main = document.getElementById('main');
+let cont = document.getElementById('cont');
+let alertdiv = document.getElementById('alert');
+let text = document.getElementById('text');
+let charging = document.getElementById('charging');
+let chargingText = document.getElementById('chargingText');
+let charginstatvalue = document.getElementById('charginstatvalue');
+let batterypervalue = document.getElementById('batterypervalue');
+    navigator.getBattery().then(function(battery){
+      if(battery.charging == true){
+       chargingText.innerHTML = 'Charging<br>'+'<p>'+battery.level*100+'%'+'</p>';
+       per.innerHTML = '';
+       main.style.width = '100%';
+       charginstatvalue.innerHTML = 'charging';
+      }
+      else{
+        chargingText.innerHTML = '';
+        charginstatvalue.innerHTML = 'Not Charging';
+        batterypervalue.innerHTML = Math.floor(battery.level * 100) + '%';
+      x = Math.round(battery.level * 100);
+      let perValue = x + '%';
+      per.innerHTML = perValue;
+      main.style.width = perValue;
+      if(x >= 80){
+        main.style.background = 'green';
+      }
+      else if(x >= 60){
+        main.style.background = 'limegreen'
+      }
+      else if(x >= 30){
+        main.style.background = 'lime';
+        per.style.color = '#fff';
+      }
+      else if(x < 30 && x >= 15){
+        per.style.color = '#000';
+        main.style.position = 'static';
+        main.style.background = 'tomato';
+        per.style.webkitTextStroke = '0';
+      }
+      else if(x == 0){
+        per.style.color = '#000';
+        main.style.position = 'static';
+        per.style.webkitTextStroke = '0';
+        alertdiv.style.display = 'block';
+        text.innerHTML = 'Shutting down...';
+        text.style.textAlign = 'center';
+        cont.style.overflow = 'visible';
+        alertdiv.style.height = '30px';
+      }
+      else{
+        per.style.color = '#000';
+        main.style.position = 'static';
+        main.style.background = 'orangered';
+        per.style.webkitTextStroke = '0'
+        alertdiv.style.display = 'block';
+        cont.style.overflow = 'visible';
+        text.innerHTML = 'Your battery percentage is only ' + perValue + '! We recommend you to connect charger to your phone.'
+      }
+      }
+    });
+  },.1);
+    </script>
+</body>
+</html>
